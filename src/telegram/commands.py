@@ -37,6 +37,8 @@ def listen_for_commands(shared_flags):
                 send_reply("⏸ Bot detenido.")
             elif msg == "/reanudar":
                 shared_flags["pause"] = False
+                shared_flags["bloqueado"] = False
+
                 send_reply("▶️ Bot reanudado.")
             elif msg == "/extender":
                 shared_flags["extend"] = True

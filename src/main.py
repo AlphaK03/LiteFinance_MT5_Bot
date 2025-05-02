@@ -40,15 +40,14 @@ def run_bot_loop():
                 print(Fore.MAGENTA + "⏸️ Pausado por comando. Esperando...")
                 time.sleep(3)
                 continue
+            if shared_flags.get("bloqueado"):
+                print("❌ El bot está bloqueado por pérdida crítica. Esperando desbloqueo manual.")
+                return
 
             print(Fore.YELLOW + f"🔄 Analizando mercado para {SYMBOL}...")
             signal = predict_multi_tf(SYMBOL)
-
-            # Invertir señal
-            if signal == "BUY":
-                signal = "SELL"
-            elif signal == "SELL":
-                signal = "BUY"
+            #Esta función solo es experimental:
+            # signal = invert_signal(signal)
 
             if signal == "BUY":
                 print(Fore.GREEN + "📈 Señal: BUY detectada. Ejecutando operación...")
@@ -80,6 +79,14 @@ def run_bot_loop():
         print(Fore.LIGHTCYAN_EX + f"➡️  Operaciones: {session_stats['total']}")
         print(Fore.LIGHTCYAN_EX + f"✅ Ganadas:     {session_stats['ganadas']}")
         print(Fore.LIGHTCYAN_EX + f"💰 Profit total: {session_stats['profit_total']:.2f} USD")
+
+
+def invert_signal(signal):
+    if signal == "BUY":
+        return "SELL"
+    elif signal == "SELL":
+        return "BUY"
+    return "HOLD"
 
 if __name__ == "__main__":
     run_bot_loop()

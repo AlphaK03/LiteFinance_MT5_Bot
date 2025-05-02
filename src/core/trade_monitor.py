@@ -1,4 +1,3 @@
-
 import sys
 import os
 
@@ -15,7 +14,7 @@ import os
 from datetime import datetime
 from colorama import Fore
 
-MINIMUM_NET_PROFIT_USD = 0.15  # Ganancia neta deseada
+MINIMUM_NET_PROFIT_USD = 0.25  # Ganancia neta deseada
 COMMISSION_ESTIMATE_USD = 0.10  # Comisión típica
 
 MINIMUM_RAW_PROFIT_USD = MINIMUM_NET_PROFIT_USD + COMMISSION_ESTIMATE_USD
@@ -26,11 +25,58 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
     if session_stats is None:
         session_stats = {'total': 0, 'ganadas': 0, 'profit_total': 0.0}
     if shared_flags is None:
-        shared_flags = {"pause": False, "extend": False, "force_close": False, "status": ""}
+        shared_flags = {
+            "pause": False,
+            "extend": False,
+            "force_close": False,
+            "status": "",
+            "bloqueado": False  # 🚫 Previene futuras operaciones
+        }
+
+    def safe_close(reason):
+        print(Fore.GREEN + f"\n{reason} Cerrando operación...")
+        updated_positions = mt5.positions_get(symbol=symbol)
+        if updated_positions:
+            updated_pos = updated_positions[0]
+            result = close_trade(updated_pos, symbol)
+            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+                session_stats['total'] += 1
+                session_stats['ganadas'] += 1
+                session_stats['profit_total'] += updated_pos.profit
+                print(Fore.LIGHTMAGENTA_EX + f"🎫 ID operación cerrada: {result.order}")
+
+                log_trade({
+                    'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'symbol': symbol,
+                    'ticket': updated_pos.ticket,
+                    'direction': "BUY" if updated_pos.type == mt5.ORDER_TYPE_BUY else "SELL",
+                    'entry_price': updated_pos.price_open,
+                    'exit_price': mt5.symbol_info_tick(symbol).bid if updated_pos.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol).ask,
+                    'profit_pct': round(updated_pos.profit / updated_pos.price_open * 100, 4),
+                    'profit_usd': round(updated_pos.profit, 2),
+                    'balance_after': mt5.account_info().balance,
+                    'elapsed_sec': int(time.time() - start_time),
+                    'status': reason.strip("💡🎯🛑 ").upper()
+                })
+
+                send_trade_summary(
+                    trade_id=str(updated_pos.ticket),
+                    direction="BUY" if updated_pos.type == mt5.ORDER_TYPE_BUY else "SELL",
+                    profit_pct=updated_pos.profit / updated_pos.price_open,
+                    elapsed=int(time.time() - start_time),
+                    balance_actual=mt5.account_info().balance,
+                    cambio=round(updated_pos.profit, 2)
+                )
+
+                return True
+        return False
 
     start_time = time.time()
     fallback_mode = False
-    last_alert_step = -1  # Para evitar alertas duplicadas
+    last_alert_step = -1
+    positive_hold_start = None
+    HOLD_PROFIT_THRESHOLD = 0.10
+    HOLD_SECONDS_REQUIRED = 3
 
     while True:
         clear_console()
@@ -54,7 +100,6 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
         direction = "BUY" if pos.type == mt5.ORDER_TYPE_BUY else "SELL"
         now = datetime.now().strftime('%H:%M:%S')
 
-        # Actualizar estado
         shared_flags["status"] = f"{direction} | {profit_pct:.2f}% | {profit_usd:.2f} USD | {elapsed}s"
 
         print(Fore.CYAN + f"🕒 {now}")
@@ -68,55 +113,19 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
             print(Fore.RED + f"║   Profit:  {profit_pct:.2f}% | {profit_usd:.2f} USD")
         print(Fore.CYAN + "╚════════════════════════════════════════════╝", flush=True)
 
-        # Alerta por pérdida progresiva
         alert_step = int(abs(profit_usd)) if profit_usd < 0 else None
         if alert_step and alert_step > last_alert_step:
             last_alert_step = alert_step
-            send_telegram_alert(f"📉 Pérdida alcanzada: `{profit_usd:.2f} USD` en `{symbol}` (ID: {pos.ticket})")
+            send_telegram_alert(f"📉 Pérdida crítica: `{profit_usd:.2f} USD` en `{symbol}` (ID: {pos.ticket})")
+            if profit_usd <= -3.0:
+                shared_flags["bloqueado"] = True
+                send_telegram_alert(
+                    "🚫 Bot ha sido *detenido automáticamente* por pérdida ≥ 3. Esperando reactivación manual.")
 
-        # ⚙️ Control remoto: forzar cierre
         if shared_flags.get("force_close"):
             shared_flags["force_close"] = False
             if safe_close("🛑 Cierre forzado por comando.") is True:
                 break
-
-        def safe_close(reason):
-            print(Fore.GREEN + f"\n{reason} Cerrando operación...")
-            updated_positions = mt5.positions_get(symbol=symbol)
-            if updated_positions:
-                updated_pos = updated_positions[0]
-                result = close_trade(updated_pos, symbol)
-                if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-                    session_stats['total'] += 1
-                    session_stats['ganadas'] += 1
-                    session_stats['profit_total'] += updated_pos.profit
-                    print(Fore.LIGHTMAGENTA_EX + f"🎫 ID operación cerrada: {result.order}")
-
-                    log_trade({
-                        'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                        'symbol': symbol,
-                        'ticket': updated_pos.ticket,
-                        'direction': direction,
-                        'entry_price': entry_price,
-                        'exit_price': current_price,
-                        'profit_pct': round(profit_pct, 4),
-                        'profit_usd': round(updated_pos.profit, 2),
-                        'balance_after': mt5.account_info().balance,
-                        'elapsed_sec': elapsed,
-                        'status': reason.strip("💡🎯🛑 ").upper()
-                    })
-
-                    send_trade_summary(
-                        trade_id=str(updated_pos.ticket),
-                        direction=direction,
-                        profit_pct=profit_pct / 100,
-                        elapsed=elapsed,
-                        balance_actual=mt5.account_info().balance,
-                        cambio=round(updated_pos.profit, 2)
-                    )
-
-                    return True
-            return False
 
         if profit_pct >= target_profit_pct and profit_usd >= MINIMUM_RAW_PROFIT_USD:
             if safe_close("🎯 Objetivo alcanzado."):
@@ -126,9 +135,18 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
             print(Fore.MAGENTA + "\n⏳ Tiempo agotado. Esperando primer profit positivo...")
             fallback_mode = True
 
-        if fallback_mode and profit_usd > 0:
-            if safe_close("💡 Profit positivo detectado."):
+        if fallback_mode and profit_usd > COMMISSION_ESTIMATE_USD:
+            if safe_close("💡 Profit positivo aceptable detectado."):
                 break
+
+        if profit_usd > HOLD_PROFIT_THRESHOLD and not fallback_mode:
+            if positive_hold_start is None:
+                positive_hold_start = time.time()
+            elif time.time() - positive_hold_start >= HOLD_SECONDS_REQUIRED:
+                if safe_close("💚 Profit constante aceptable durante 3s."):
+                    break
+        else:
+            positive_hold_start = None
 
         time.sleep(check_interval)
 
@@ -184,7 +202,7 @@ def log_trade(data):
     file_path = 'trade_log.csv'
     file_exists = os.path.isfile(file_path)
 
-    with open(file_path, mode='a', newline='') as file:
+    with open(file_path, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=data.keys())
         if not file_exists:
             writer.writeheader()
