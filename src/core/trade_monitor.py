@@ -1,25 +1,15 @@
 import sys
 import os
-
-from src.telegram.alerts import send_telegram_alert, send_trade_summary
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import csv
-import sys
-
-import MetaTrader5 as mt5
 import time
-import os
 from datetime import datetime
 from colorama import Fore
+import MetaTrader5 as mt5
+from src.telegram.alerts import send_telegram_alert, send_trade_summary
 
-MINIMUM_NET_PROFIT_USD = 0.25  # Ganancia neta deseada
-COMMISSION_ESTIMATE_USD = 0.10  # Comisión típica
-
+MINIMUM_NET_PROFIT_USD = 0.30
+COMMISSION_ESTIMATE_USD = 0.05
 MINIMUM_RAW_PROFIT_USD = MINIMUM_NET_PROFIT_USD + COMMISSION_ESTIMATE_USD
-
-
 
 def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_interval=0.2, session_stats=None, shared_flags=None):
     if session_stats is None:
@@ -30,7 +20,7 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
             "extend": False,
             "force_close": False,
             "status": "",
-            "bloqueado": False  # 🚫 Previene futuras operaciones
+            "bloqueado": False
         }
 
     def safe_close(reason):
@@ -56,7 +46,7 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
                     'profit_usd': round(updated_pos.profit, 2),
                     'balance_after': mt5.account_info().balance,
                     'elapsed_sec': int(time.time() - start_time),
-                    'status': reason.strip("💡🎯🛑 ").upper()
+                    'status': reason.strip("💡🎯🛑📉 ").upper()
                 })
 
                 send_trade_summary(
@@ -67,102 +57,79 @@ def monitor_and_close(symbol, target_profit_pct=0.05, timeout_sec=120, check_int
                     balance_actual=mt5.account_info().balance,
                     cambio=round(updated_pos.profit, 2)
                 )
-
                 return True
         return False
 
     start_time = time.time()
-    fallback_mode = False
-    last_alert_step = -1
-    positive_hold_start = None
-    HOLD_PROFIT_THRESHOLD = 0.10
-    HOLD_SECONDS_REQUIRED = 3
+    hold_start = None
+    max_profit = float('-inf')
+    profit_window_ready = False
 
     while True:
         clear_console()
-
         positions = mt5.positions_get(symbol=symbol)
         if not positions:
-            print(Fore.YELLOW + f"📭 No hay operaciones abiertas para {symbol}")
-            break
+            print(Fore.RED + f"❌ No hay operación activa para {symbol}.")
+            return
 
         pos = positions[0]
         entry_price = pos.price_open
         tick = mt5.symbol_info_tick(symbol)
         current_price = tick.bid if pos.type == mt5.ORDER_TYPE_BUY else tick.ask
-
-        profit_pct = ((current_price - entry_price) / entry_price) * 100
-        if pos.type == mt5.ORDER_TYPE_SELL:
-            profit_pct *= -1
-
         profit_usd = pos.profit
         elapsed = int(time.time() - start_time)
-        direction = "BUY" if pos.type == mt5.ORDER_TYPE_BUY else "SELL"
-        now = datetime.now().strftime('%H:%M:%S')
 
-        shared_flags["status"] = f"{direction} | {profit_pct:.2f}% | {profit_usd:.2f} USD | {elapsed}s"
+        if profit_usd > max_profit:
+            max_profit = profit_usd
 
-        print(Fore.CYAN + f"🕒 {now}")
-        print(Fore.CYAN + "╔════════════════════════════════════════════╗")
-        print(Fore.CYAN + f"║   🪙 {symbol} | 📈 {direction} | ⏱️ {elapsed} seg")
-        print(Fore.CYAN + f"║   Entrada: {entry_price:.2f} | Actual: {current_price:.2f}")
-        print(Fore.CYAN + f"║   Ticket ID: {pos.ticket}")
-        if profit_pct >= 0:
-            print(Fore.GREEN + f"║   Profit:  {profit_pct:.2f}% | {profit_usd:.2f} USD")
+        if profit_usd >= COMMISSION_ESTIMATE_USD:
+            if hold_start is None:
+                hold_start = time.time()
+            elif time.time() - hold_start >= 2:
+                profit_window_ready = True
         else:
-            print(Fore.RED + f"║   Profit:  {profit_pct:.2f}% | {profit_usd:.2f} USD")
-        print(Fore.CYAN + "╚════════════════════════════════════════════╝", flush=True)
+            hold_start = None
+            profit_window_ready = False
 
-        alert_step = int(abs(profit_usd)) if profit_usd < 0 else None
-        if alert_step and alert_step > last_alert_step:
-            last_alert_step = alert_step
-            send_telegram_alert(f"📉 Pérdida crítica: `{profit_usd:.2f} USD` en `{symbol}` (ID: {pos.ticket})")
-            if profit_usd <= -3.0:
-                shared_flags["bloqueado"] = True
-                send_telegram_alert(
-                    "🚫 Bot ha sido *detenido automáticamente* por pérdida ≥ 3. Esperando reactivación manual.")
+        if profit_window_ready and profit_usd < max_profit:
+            if safe_close("📉 Retroceso tras 2s de profit aceptable."):
+                break
 
         if shared_flags.get("force_close"):
             shared_flags["force_close"] = False
-            if safe_close("🛑 Cierre forzado por comando.") is True:
+            if safe_close("🛑 Cierre forzado por comando."):
                 break
-
-        if profit_pct >= target_profit_pct and profit_usd >= MINIMUM_RAW_PROFIT_USD:
-            if safe_close("🎯 Objetivo alcanzado."):
-                break
-
-        if not fallback_mode and elapsed >= timeout_sec:
-            print(Fore.MAGENTA + "\n⏳ Tiempo agotado. Esperando primer profit positivo...")
-            fallback_mode = True
-
-        if fallback_mode and profit_usd > COMMISSION_ESTIMATE_USD:
-            if safe_close("💡 Profit positivo aceptable detectado."):
-                break
-
-        if profit_usd > HOLD_PROFIT_THRESHOLD and not fallback_mode:
-            if positive_hold_start is None:
-                positive_hold_start = time.time()
-            elif time.time() - positive_hold_start >= HOLD_SECONDS_REQUIRED:
-                if safe_close("💚 Profit constante aceptable durante 3s."):
-                    break
-        else:
-            positive_hold_start = None
 
         time.sleep(check_interval)
 
+FILLING_MODES_CACHE = {}
+
 def close_trade(pos, symbol):
-    existing_positions = mt5.positions_get(ticket=pos.ticket)
-    if not existing_positions:
-        print(Fore.YELLOW + f"⚠️ La posición {pos.ticket} ya no está activa.")
-        return None
+    if symbol not in FILLING_MODES_CACHE:
+        for modo in [mt5.ORDER_FILLING_IOC, mt5.ORDER_FILLING_FOK, mt5.ORDER_FILLING_RETURN]:
+            test_request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": pos.volume,
+                "type": mt5.ORDER_TYPE_BUY,
+                "price": mt5.symbol_info_tick(symbol).ask,
+                "deviation": 10,
+                "magic": 42,
+                "comment": "FILL_TEST",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": modo,
+            }
+            test_result = mt5.order_check(test_request)
+            if test_result and test_result.retcode == mt5.TRADE_RETCODE_DONE:
+                FILLING_MODES_CACHE[symbol] = modo
+                break
+        else:
+            FILLING_MODES_CACHE[symbol] = mt5.ORDER_FILLING_FOK
 
     close_type = mt5.ORDER_TYPE_SELL if pos.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY
     tick = mt5.symbol_info_tick(symbol)
-    if not tick:
-        print(Fore.RED + f"❌ No se pudo obtener el precio actual de {symbol}.")
-        return None
-
     close_price = tick.bid if close_type == mt5.ORDER_TYPE_SELL else tick.ask
+
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "position": pos.ticket,
@@ -172,44 +139,22 @@ def close_trade(pos, symbol):
         "price": close_price,
         "deviation": 10,
         "magic": 42,
-        "comment": "Test Close",
+        "comment": "Auto Close",
         "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": 0,
+        "type_filling": FILLING_MODES_CACHE[symbol],
     }
 
-    print(Fore.YELLOW + f"📤 Enviando cierre: vol={pos.volume}, tipo={close_type}, precio={close_price:.2f}")
     result = mt5.order_send(request)
-
-    if result is None:
-        print(Fore.RED + "❌ mt5.order_send() retornó None. Reintentando tras reconexión...")
-        mt5.shutdown()
-        if not mt5.initialize():
-            print(Fore.RED + "❌ Reintento fallido: no se pudo reconectar.")
-            return None
-        result = mt5.order_send(request)
-        if result is None:
-            print(Fore.RED + "❌ Segundo intento fallido. No se pudo cerrar la operación.")
-            return None
-
-    if result.retcode == mt5.TRADE_RETCODE_DONE:
-        print(Fore.GREEN + f"✅ Operación cerrada con éxito (retcode {result.retcode})")
-    else:
-        print(Fore.RED + f"❌ Cierre fallido: retcode {result.retcode} - {result.comment}")
-
     return result
 
 def log_trade(data):
     file_path = 'trade_log.csv'
     file_exists = os.path.isfile(file_path)
-
     with open(file_path, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=data.keys())
         if not file_exists:
             writer.writeheader()
         writer.writerow(data)
-
-
-
 
 def clear_console():
     sys.stdout.write('\033[2J\033[H')

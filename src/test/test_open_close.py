@@ -6,7 +6,7 @@ import os
 
 init(autoreset=True)
 
-SYMBOL = "XAUUSD"
+SYMBOL = "ALGUSD"
 VOLUME = 0.01
 
 def connect():

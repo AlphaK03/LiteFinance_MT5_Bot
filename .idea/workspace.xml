@@ -4,28 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="38cf73de-c477-49d3-a43f-9850fe32233c" name="Changes" comment="">
+    <list default="true" id="38cf73de-c477-49d3-a43f-9850fe32233c" name="Changes" comment="Version DEMO">
       <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/LiteFinance_MT5_Bot.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/mt5_connection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/trade_executor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/trade_monitor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/strategies/multi_tf_predictor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/strategies/rsi_ema_strategy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/telegram/alerts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/telegram/commands.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/telegram/control.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/test_open_close.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/test_telegram_bot.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/indicators.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/AnyDeskBot.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/monitorear_operacion_activa_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/mt5_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/mt5_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/trade_executor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/trade_executor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/trade_monitor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/trade_monitor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/strategies/multi_tf_predictor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/strategies/multi_tf_predictor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/strategies/rsi_ema_strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/strategies/rsi_ema_strategy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/test_open_close.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/test_open_close.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,8 +31,25 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "AlphaK03"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/AlphaK03/LiteFinance_MT5_Bot.git",
+    "accountId": "010bab25-58a5-4fe1-a6ce-180528769677"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 1
 }]]></component>
@@ -53,10 +61,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.AnyDeskBot.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.monitorear_operacion_activa_test.executor": "Run",
+    "Python.mt5_login_test.executor": "Run",
     "Python.test_open_close.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "MT5__REAL",
     "last_opened_file_path": "D:/PortafolioDesarrollador/LiteFinance_MT5_Bot/src/telegram",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -72,6 +83,29 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="AnyDeskBot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="LiteFinance_MT5_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test/AnyDeskBot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="LiteFinance_MT5_Bot" />
       <option name="ENV_FILES" value="" />
@@ -87,6 +121,52 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="monitorear_operacion_activa_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="LiteFinance_MT5_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test/monitorear_operacion_activa_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="mt5_login_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="LiteFinance_MT5_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test/mt5_login_test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -121,7 +201,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.AnyDeskBot" />
+        <item itemvalue="Python.monitorear_operacion_activa_test" />
         <item itemvalue="Python.test_open_close" />
+        <item itemvalue="Python.mt5_login_test" />
       </list>
     </recent_temporary>
   </component>
@@ -141,31 +224,67 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1746147673934</updated>
-      <workItem from="1746147683161" duration="19715000" />
+      <workItem from="1746147683161" duration="70205000" />
     </task>
+    <task id="LOCAL-00001" summary="Versión funcional LiteFinance + Python + MT5 + Telegram.&#10;&#10;El profit es bueno, sigue en fase de pruebas.">
+      <option name="closed" value="true" />
+      <created>1746169873092</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1746169873092</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Version DEMO">
+      <option name="closed" value="true" />
+      <created>1746192071941</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746192071941</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Versión funcional LiteFinance + Python + MT5 + Telegram.&#10;&#10;El profit es bueno, sigue en fase de pruebas." />
+    <MESSAGE value="Version DEMO" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version DEMO" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/core/trade_executor.py</url>
-          <line>3</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/src/main.py</url>
+          <line>43</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/core/trade_monitor.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="3" />
+          <url>file://$PROJECT_DIR$/src/test/AnyDeskBot.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$test_open_close.coverage" NAME="test_open_close Coverage Results" MODIFIED="1746162131365" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
-    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$main.coverage" NAME="main Coverage Results" MODIFIED="1746163709394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$test_open_close.coverage" NAME="test_open_close Coverage Results" MODIFIED="1746285748996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
+    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$main.coverage" NAME="main Coverage Results" MODIFIED="1746312637464" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$monitorear_operacion_activa_test.coverage" NAME="monitorear_operacion_activa_test Coverage Results" MODIFIED="1746287257363" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
+    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$mt5_login_test.coverage" NAME="mt5_login_test Coverage Results" MODIFIED="1746187992682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
+    <SUITE FILE_PATH="coverage/LiteFinance_MT5_Bot$AnyDeskBot.coverage" NAME="AnyDeskBot Coverage Results" MODIFIED="1746312470899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
   </component>
 </project>
